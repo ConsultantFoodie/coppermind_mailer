@@ -1,5 +1,7 @@
 from models import Session, Student, Course, Signup, Deadline
 import yagmail
+import schedule
+import time
 
 session = Session()
 
@@ -19,11 +21,20 @@ def make_mail(student):
 print(session.query(Student).all())
 print(session.query(Deadline).all())
 
-for student in session.query(Student).all():
-	contents = make_mail(student)
-	try:
-	    # yag.send(to=student.email, subject='A Message from Sazed', contents=contents)
-	    print(contents)
-	    print("Email sent successfully")
-	except:
-	    print("Error, email was not sent")
+def send_mails():
+	for student in session.query(Student).all():
+		contents = make_mail(student)
+		try:
+		    # yag.send(to=student.email, subject='A Message from Sazed', contents=contents)
+		    print(contents)
+		    print("Email sent successfully")
+		except:
+		    print("Error, email was not sent")
+
+	return None
+
+schedule.every(10).seconds.do(send_mails)
+
+while True: 
+    schedule.run_pending() 
+    time.sleep(1) 
