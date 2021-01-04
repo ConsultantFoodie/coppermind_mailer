@@ -1,1 +1,1 @@
-service: python mailer.py
+web: python mailer.py
