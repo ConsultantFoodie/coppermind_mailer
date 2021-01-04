@@ -25,7 +25,7 @@ def send_mails():
 	for student in session.query(Student).all():
 		contents = make_mail(student)
 		try:
-		    # yag.send(to=student.email, subject='A Message from Sazed', contents=contents)
+		    yag.send(to=student.email, subject='A Message from Sazed', contents=contents)
 		    print(contents)
 		    print("Email sent successfully")
 		except:
@@ -33,7 +33,7 @@ def send_mails():
 
 	return None
 
-schedule.every(10).seconds.do(send_mails)
+schedule.every(60).seconds.do(send_mails)
 
 while True: 
     schedule.run_pending() 
