@@ -3,11 +3,7 @@ import yagmail
 import schedule
 import time
 
-session = Session()
-
-yag = yagmail.SMTP(user='coppermind.harmony@gmail.com', password='HeroOfAges')
-
-def make_mail(student):
+def make_mail(student, session):
 		courses = session.query(Course).filter(Signup.course_id==Course.id, Signup.student_id==student.id).order_by(Signup.course_id).all()
 		contents = 'Here are your upcoming deadlines:\n\n'
 		for course in courses:
@@ -18,12 +14,18 @@ def make_mail(student):
 
 		return contents
 
-print(session.query(Student).all())
-print(session.query(Deadline).all())
+# print(session.query(Student).all())
+# print(session.query(Deadline).all())
 
 def send_mails():
-	for student in session.query(Student).all():
-		contents = make_mail(student)
+	yag = yagmail.SMTP(user='coppermind.harmony@gmail.com', password='HeroOfAges')
+	session = Session()
+	student_list = session.query(Student).all()
+	session.close()
+	for student in student_list:
+		session = Session()
+		contents = make_mail(student, session)
+		session.close()
 		try:
 		    yag.send(to=student.email, subject='A Message from Sazed', contents=contents)
 		    print(contents)
@@ -31,10 +33,11 @@ def send_mails():
 		except:
 		    print("Error, email was not sent")
 
+	yag.close()
 	return None
 
-schedule.every(60).seconds.do(send_mails)
-
+schedule.every().day.at("06:30").do(send_mails) #Heroku server at UTC time. This is 12:00 pm IST
+print("I am running")
 while True: 
     schedule.run_pending() 
     time.sleep(1) 
