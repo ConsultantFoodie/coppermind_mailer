@@ -1,1 +1,1 @@
-worker: python mailer.py
+service: python mailer.py
