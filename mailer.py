@@ -2,6 +2,8 @@ from models import Session, Student, Course, Signup, Deadline
 import yagmail
 import schedule
 import time
+import os
+from datetime import datetime
 
 def make_mail(student, session):
 		courses = session.query(Course).filter(Signup.course_id==Course.id, Signup.student_id==student.id).order_by(Signup.course_id).all()
@@ -18,7 +20,7 @@ def make_mail(student, session):
 # print(session.query(Deadline).all())
 
 def send_mails():
-	yag = yagmail.SMTP(user='coppermind.harmony@gmail.com', password='HeroOfAges')
+	yag = yagmail.SMTP(user='coppermind.harmony@gmail.com', password=os.environ.get('MAILER_PASSWORD'))
 	session = Session()
 	student_list = session.query(Student).all()
 	session.close()
@@ -27,7 +29,7 @@ def send_mails():
 		contents = make_mail(student, session)
 		session.close()
 		try:
-		    yag.send(to=student.email, subject='A Message from Sazed', contents=contents)
+		    yag.send(to=student.email, subject='Upcoming Deadlines as on {}'.format(datetime.now().strftime('%d/%m')), contents=contents)
 		    print(contents)
 		    print("Email sent successfully")
 		except:
@@ -35,6 +37,7 @@ def send_mails():
 
 	yag.close()
 	return None
+
 
 schedule.every().day.at("06:30").do(send_mails) #Heroku server at UTC time. This is 12:00 pm IST
 print("I am running")
