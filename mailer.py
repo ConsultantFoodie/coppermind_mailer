@@ -27,6 +27,7 @@ def make_mail(student, session):
 # print(session.query(Deadline).all())
 
 def send_mails():
+	Deadline.delete_old()
 	yag = yagmail.SMTP(user='coppermind.harmony@gmail.com', password=os.environ.get('MAILER_PASSWORD'))
 	session = Session()
 	student_list = session.query(Student).all()

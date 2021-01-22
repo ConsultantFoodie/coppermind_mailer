@@ -2,6 +2,7 @@ from sqlalchemy import MetaData, Table, create_engine, Column, Integer, ForeignK
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 import os
+import datetime
 
 engine = create_engine(os.environ.get('DATABASE_URL'))
 Session = sessionmaker(bind=engine)
@@ -27,7 +28,6 @@ class Course(Base):
 class Signup(Base):
 	__table__ = Table('signup', Base.metadata,
                     autoload=True, autoload_with=engine)
-	
 
 	def __repr__(self):
 		return 'C:{}, S:{}\n'.format(self.course_id, self.student_id)
@@ -35,6 +35,14 @@ class Signup(Base):
 class Deadline(Base):
 	__table__ = Table('deadline', Base.metadata,
                     autoload=True, autoload_with=engine)
+
+	@classmethod
+	def delete_old(cls):
+		today_date = datetime.date.today()
+		session = Session()
+		session.query(cls).filter(cls.submit_date < today_date).delete()
+		session.commit()
+		session.close()
 
 	def __repr__(self):
 		work_list = ['Other', 'Quiz', 'Test', 'Submission', 'Project', 'Viva']
