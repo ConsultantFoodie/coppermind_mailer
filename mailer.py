@@ -38,9 +38,9 @@ def send_mails():
 	yag.close()
 	return None
 
-
-schedule.every().day.at("06:30").do(send_mails) #Heroku server at UTC time. This is 12:00 pm IST
-print("I am running")
-while True: 
-    schedule.run_pending() 
-    time.sleep(1) 
+if __name__ == "__main__":
+	schedule.every().day.at("06:30").do(send_mails) #Heroku server at UTC time. This is 12:00 pm IST
+	print("I am running")
+	while True: 
+		schedule.run_pending() 
+		time.sleep(1) 
