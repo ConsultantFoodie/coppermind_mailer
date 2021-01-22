@@ -8,12 +8,19 @@ from datetime import datetime
 def make_mail(student, session):
 		courses = session.query(Course).filter(Signup.course_id==Course.id, Signup.student_id==student.id).order_by(Signup.course_id).all()
 		contents = 'Here are your upcoming deadlines:\n\n'
+		has_work = False
 		for course in courses:
-			contents += course.course_name + '\n'
-			for work in course.deadlines:
-				contents += work.__repr__()
-			contents += '____________________\n'
+			if course.deadlines:
+				has_work = True
+				contents += course.course_name + '\n'
+				for work in course.deadlines:
+					contents += work.__repr__()
+				contents += '____________________\n'
 
+		if not has_work:
+			contents += 'You have no upcoming deadlines!\n'
+
+		contents += 'For more details, check out http://coppermind-harmony.herokuapp.com/ \n'
 		return contents
 
 # print(session.query(Student).all())
